@@ -16,16 +16,15 @@ def gaussian(angle=0.0, size=(100, 100), skew=(0.0, 0.0), std=(1.0, 1.0)):
     Returns:
         array -- Asymmetric Gaussian kernel
     """
-
-    # Pad by a factor of 2 to account for kernel rotations
-    padding = [(x // 2) + 1 for x in size]
+    # Pad to account for kernel rotations
+    padding = max(size)
 
     # Create 1D Gaussians
     pdfs = []
     for i in range(2):
 
         # Define padded size and shape of the kernel
-        padded = 2 * padding[i] + size[i]
+        padded = 2 * padding + size[i]
         pdf = np.arange(padded) - ((padded - 1) / 2)
 
         # Set the standard deviation
@@ -44,15 +43,31 @@ def gaussian(angle=0.0, size=(100, 100), skew=(0.0, 0.0), std=(1.0, 1.0)):
 
     # Rotate kernel and trim padding
     kernel = rotate(kernel, angle, reshape=False)
-    kernel = kernel[padding[0]:-padding[0], padding[1]:-padding[1]]
+    kernel = kernel[padding:-padding, padding:-padding]
 
     return kernel
 
-angle = np.random.uniform(-180, 180)
-size = (55, 55)
-skew = np.random.uniform(-3, 3, 2)
-std = np.random.uniform(1, 20, 2)
-kernel = gaussian(angle=angle, size=size, skew=skew, std=std)
-plt.figure()
-plt.imshow(kernel)
-plt.show()
+def wave(angle=0.0, frequency=1.0, size=(100, 100)):
+    """Generate Cosine wave kernel
+    
+    Keyword Arguments:
+        angle {float} -- Rotation in degrees (default: {0.0})
+        frequency {float} -- Number of waves per kernel length (default: {1.0})
+        size {tuple} -- Kernel size (default: {(100, 100)})
+    
+    Returns:
+        array -- Cosine wave kernel
+    """
+    # Pad to account for kernel rotations
+    padding = max(size)
+
+    # Create 2D wave pattern
+    kernel = np.linspace(-np.pi, np.pi, size[0] + 2 * padding)
+    kernel = np.tile(kernel, (size[1] + 2 * padding, 1))
+    kernel = np.cos(frequency * kernel)
+
+    # Rotate kernel and trim padding
+    kernel = rotate(kernel, angle, reshape=False)
+    kernel = kernel[padding:-padding, padding:-padding]
+
+    return kernel
