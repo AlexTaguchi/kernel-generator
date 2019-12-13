@@ -45,6 +45,9 @@ def gaussian(angle=0.0, size=(100, 100), skew=(0.0, 0.0), std=(1.0, 1.0)):
     kernel = rotate(kernel, angle, reshape=False)
     kernel = kernel[padding:-padding, padding:-padding]
 
+    # Normalize probability density function
+    kernel /= sum(sum(kernel))
+
     return kernel
 
 def wave(angle=0.0, frequency=1.0, size=(100, 100)):
